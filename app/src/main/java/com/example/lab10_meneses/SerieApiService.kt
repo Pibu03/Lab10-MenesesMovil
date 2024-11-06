@@ -10,19 +10,20 @@ import retrofit2.http.PUT
 import retrofit2.http.Path
 
 interface SerieApiService {
-    @GET("serie")
-    suspend fun selectSeries():ArrayList<SerieModel>
+    @GET("posts")
+    suspend fun selectSeries(): ArrayList<SerieModel>
 
-    @GET("serie/{id}")
-    suspend fun selectSerie(@Path("id") id:String): Response<SerieModel>
+    @GET("posts/{id}")
+    suspend fun selectSerie(@Path("id") id: String): Response<SerieModel>
 
     @Headers("Content-Type: application/json")
-    @POST("serie")
+    @POST("posts")
     suspend fun insertSerie(@Body serie: SerieModel): Response<SerieModel>
 
-    @PUT("serie/{id}")
-    suspend fun updateSerie(@Path("id") id:String, @Body serie: SerieModel): Response<SerieModel>
+    @PUT("posts/{id}")
+    suspend fun updateSerie(@Path("id") id: String, @Body serie: SerieModel): Response<SerieModel>
 
-    @DELETE("serie/{id}")
-    suspend fun deleteSerie(@Path("id") id:String): Response<SerieModel>
+    @DELETE("posts/{id}")
+    suspend fun deleteSerie(@Path("id") id: String): Response<SerieModel>
 }
+

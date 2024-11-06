@@ -1,9 +1,12 @@
 package com.example.lab10_meneses
 
 import android.util.Log
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxSize
+import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -12,8 +15,10 @@ import androidx.compose.material.icons.outlined.Delete
 import androidx.compose.material.icons.outlined.Edit
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextField
 import androidx.compose.runtime.Composable
@@ -26,12 +31,12 @@ import androidx.compose.runtime.setValue
 import androidx.compose.runtime.snapshots.SnapshotStateList
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import kotlinx.coroutines.delay
-
 
 @Composable
 fun ContenidoSeriesListado(navController: NavHostController, servicio: SerieApiService) {
@@ -41,11 +46,14 @@ fun ContenidoSeriesListado(navController: NavHostController, servicio: SerieApiS
         listado.forEach { listaSeries.add(it) }
     }
 
-    LazyColumn (
-
-    ){
+    LazyColumn(
+        modifier = Modifier
+            .fillMaxSize()
+            .padding(8.dp),
+        contentPadding = PaddingValues(8.dp)
+    ) {
         item {
-            Row (
+            Row(
                 modifier = Modifier.fillParentMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically
             ) {
@@ -53,49 +61,74 @@ fun ContenidoSeriesListado(navController: NavHostController, servicio: SerieApiS
                     text = "ID",
                     fontSize = 20.sp,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.weight(0.1f)
                 )
                 Text(
                     text = "SERIE",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.weight(0.7f)
                 )
                 Text(
                     text = "Accion",
                     fontSize = 18.sp,
                     fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onBackground,
                     modifier = Modifier.weight(0.2f)
-                ) //, fontWeight = FontWeight.Bold)
+                )
             }
         }
 
         items(listaSeries) { item ->
             Row(
-                modifier = Modifier.padding(start=8.dp).fillParentMaxWidth(),
+                modifier = Modifier
+                    .padding(vertical = 8.dp, horizontal = 4.dp)
+                    .fillParentMaxWidth()
+                    .background(MaterialTheme.colorScheme.surface, shape = MaterialTheme.shapes.medium)
+                    .padding(8.dp),
                 verticalAlignment = Alignment.CenterVertically
             ) {
-                Text(text = "${item.id}", fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier= Modifier.weight(0.1f))
-                Text(text = item.name, fontSize = 20.sp, fontWeight = FontWeight.Bold, modifier= Modifier.weight(0.6f))
+                Text(
+                    text = "${item.id}",
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(0.1f)
+                )
+                Text(
+                    text = item.name,
+                    fontSize = 20.sp,
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.onSurface,
+                    modifier = Modifier.weight(0.6f)
+                )
                 IconButton(
                     onClick = {
                         navController.navigate("serieVer/${item.id}")
-                        Log.e("SERIE-VER","ID = ${item.id}")
+                        Log.e("SERIE-VER", "ID = ${item.id}")
                     },
-                    Modifier.weight(0.1f)
+                    modifier = Modifier.weight(0.1f)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Edit, contentDescription = "Ver", modifier= Modifier.align(
-                        Alignment.CenterVertically))
+                    Icon(
+                        imageVector = Icons.Outlined.Edit,
+                        contentDescription = "Editar",
+                        tint = MaterialTheme.colorScheme.primary
+                    )
                 }
                 IconButton(
                     onClick = {
                         navController.navigate("serieDel/${item.id}")
-                        Log.e("SERIE-DEL","ID = ${item.id}")
+                        Log.e("SERIE-DEL", "ID = ${item.id}")
                     },
-                    Modifier.weight(0.1f)
+                    modifier = Modifier.weight(0.1f)
                 ) {
-                    Icon(imageVector = Icons.Outlined.Delete, contentDescription = "Ver", modifier= Modifier.align(
-                        Alignment.CenterVertically))
+                    Icon(
+                        imageVector = Icons.Outlined.Delete,
+                        contentDescription = "Eliminar",
+                        tint = MaterialTheme.colorScheme.error
+                    )
                 }
             }
         }
@@ -106,7 +139,6 @@ fun ContenidoSeriesListado(navController: NavHostController, servicio: SerieApiS
 fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiService, pid: Int = 0 ) {
     var id by remember { mutableStateOf<Int>(pid) }
     var name by remember { mutableStateOf<String?>("") }
-    var release_date by remember { mutableStateOf<String?>("") }
     var rating by remember { mutableStateOf<String?>("") }
     var category by remember { mutableStateOf<String?>("") }
     var grabar by remember { mutableStateOf(false) }
@@ -115,10 +147,9 @@ fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiSer
         LaunchedEffect(Unit) {
             val objSerie = servicio.selectSerie(id.toString())
             delay(100)
-            name = objSerie.body()?.name
-            release_date = objSerie.body()?.release_date
-            rating = objSerie.body()?.rating.toString()
-            category = objSerie.body()?.category
+            name = objSerie.body()?.name ?: ""
+            rating = objSerie.body()?.userId.toString()
+            category = objSerie.body()?.category ?: ""
         }
     }
 
@@ -126,8 +157,7 @@ fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiSer
         modifier = Modifier
             .fillMaxSize()
             .padding(16.dp)
-    ){
-        // Spacer(Modifier.height(50.dp))
+    ) {
         TextField(
             value = id.toString(),
             onValueChange = { },
@@ -139,12 +169,6 @@ fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiSer
             value = name!!,
             onValueChange = { name = it },
             label = { Text("Name: ") },
-            singleLine = true
-        )
-        TextField(
-            value = release_date!!,
-            onValueChange = { release_date = it },
-            label = { Text("Release Date:") },
             singleLine = true
         )
         TextField(
@@ -160,16 +184,19 @@ fun ContenidoSerieEditar(navController: NavHostController, servicio: SerieApiSer
             singleLine = true
         )
         Button(
-            onClick = {
-                grabar = true
-            }
+            onClick = { grabar = true },
+            colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary),
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(vertical = 8.dp),
+            shape = MaterialTheme.shapes.medium // Esquinas redondeadas
         ) {
-            Text("Grabar", fontSize=16.sp)
+            Text("Grabar", fontSize = 16.sp, color = Color.White)
         }
     }
 
     if (grabar) {
-        val objSerie = SerieModel(id,name!!, release_date!!, rating!!.toInt(), category!!)
+        val objSerie = SerieModel(id, 1, name!!, category!!)
         LaunchedEffect(Unit) {
             if (id == 0)
                 servicio.insertSerie(objSerie)
@@ -196,13 +223,18 @@ fun ContenidoSerieEliminar(navController: NavHostController, servicio: SerieApiS
                     onClick = {
                         showDialog = false
                         borrar = true
-                    } ) {
-                    Text("Aceptar")
+                    },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.primary)
+                ) {
+                    Text("Aceptar", color = Color.White)
                 }
             },
             dismissButton = {
-                Button( onClick = { showDialog = false } ) {
-                    Text("Cancelar")
+                Button(
+                    onClick = { showDialog = false },
+                    colors = ButtonDefaults.buttonColors(containerColor = MaterialTheme.colorScheme.secondary)
+                ) {
+                    Text("Cancelar", color = Color.White)
                     navController.navigate("series")
                 }
             }
@@ -210,7 +242,6 @@ fun ContenidoSerieEliminar(navController: NavHostController, servicio: SerieApiS
     }
     if (borrar) {
         LaunchedEffect(Unit) {
-            // val objSerie = servicio.selectSerie(id.toString())
             servicio.deleteSerie(id.toString())
             borrar = false
             navController.navigate("series")
